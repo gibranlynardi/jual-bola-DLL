@@ -132,3 +132,112 @@ Menurut saya, Django digunakan karena menggunakan bahasa python yang memang terg
 ## Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
 
 Tidak ada, sudah sangat komprehensif sehingga jika belajar dari tutorial 1 sudah dapat mengaplikasikannya sendiri. Terima kasih banyakk kakak kakak asdoss! Mungkin jika memungkinkan beberapa tambahan troubleshooting disediakan juga jika memungkinkan.
+
+#### TUGAS INDIVIDU 2
+
+## 1.
+Data delivery diperlukan dikarenakan jika kita mengimplementasikan sebuah aplikasi pada suatu platform, maka akan ada user yang menggunakan aplikasi tersebut. User akan mengirimkan data-data pada client side dan diproses pada server side untuk dikembalikan kembali ke user. Jika tidak ada delivery maka kita tidak dapat melakukan transaksi data antara user dan server.
+
+## 2.
+JSON menurutku lebih baik karena segi syntax saja dan juga readability. XML menurutku terlalu rigid untuk dilihat dan dibaca sementara JSON menggunakan model dictionary. Karena banyak aplikasi web yang menggunakan RestAPI, JSON lebih sering digunakan dan meningkat popularitasnya.
+
+## 3.
+is_valid() basically pencegah data yang imperfect. Method tersebut akan mengecek apakah data mengikuti semua parameter dan constraints dari tipe field yang digunakan. Kita membutuhkan method tersebut karena basically kita ga akan percaya apa yang user berikan, juga membantu user untuk memberikan data yang benar.
+
+## 4.
+Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+ada sebuah attack bernama Cross-Site Request Forgery (CSRF) di mana akan ada aksi yang sebenarnya bukan sesuai keinginan user. Namun dengan csrf_token, permintaan POST tanpa csrf_token yang valid akan mengembalikan halaman html error sehingga web terlindungi.
+
+## 5.
+1.  Menambahkan path-path baru untuk method-method views baru yaitu
+    ```python
+    path('create-product/', create_product, name='create_product'),
+    path('product/<str:id>/', show_product, name='show_product'),
+    path('xml', show_xml, name ='show_xml'),
+    path('json', show_json, name='show_json'),
+    path('xml/<str:news_id>/', show_xml_by_id, name='show_xml_by_id'),
+    path('json/<str:news_id>/', show_json_by_id, name='show_json_by_id'),
+    ```
+2.  membuat method method yang akan menampilkan template html di views.py
+    ```python
+    def create_product(request):
+        form = ProductForm(request.POST or None)
+
+        if form.is_valid() and request.method == "POST":
+            form.save()
+            return redirect('main:show_main') 
+
+        context = {'form': form}
+        return render(request, "create_product.html", context)
+
+    def show_product(request, id):
+        product = get_object_or_404(Product, pk=id)
+
+        context = {
+            'product': product
+        }
+
+        return render(request, "product_detail.html", context)
+
+    def show_xml(request):
+        product_list = Product.objects.all()
+        xml_data = serializers.serialize("xml", product_list)
+        return HttpResponse(xml_data, content_type="application/xml")
+
+    def show_json(request):
+        product_list = Product.objects.all()
+        json_data = serializers.serialize("json", product_list)
+        return HttpResponse(json_data, content_type="application/json")
+
+    def show_xml_by_id(request, product_id):
+       try:
+           product_item = Product.objects.filter(pk=product_id)
+           xml_data = serializers.serialize("xml", product_item)
+           return HttpResponse(xml_data, content_type="application/xml")
+       except Product.DoesNotExist:
+           return HttpResponse(status=404)
+
+    def show_json_by_id(request, product_id):
+       try:
+           product_item = Product.objects.get(pk=product_id)
+           json_data = serializers.serialize("json", [product_item])
+           return HttpResponse(json_data, content_type="application/json")
+       except Product.DoesNotExist:
+           return HttpResponse(status=404)
+    ```
+3.  Membuat base.html agar html-html file semua selaras strukturnya mengikuti parent file yaitu base.html.
+    ```html
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {% block meta %} {% endblock meta %}
+    </head>
+
+    <body>
+        {% block content %} {% endblock content %}
+    </body>
+    </html>
+    ```
+4.  Menambahkan file baru di root yaitu forms.py berisi class form untuk menambahkan produk dengan fields yang diambil untuk diisi user adalah sesuai di models.py
+    ```python
+    class ProductForm(ModelForm):
+        class Meta:
+            model = Product
+            fields = ["name", "price", "description", "thumbnail", "category", "is_featured"]
+    ```
+5.  membuat 2 file HTML baru di main (create_product untuk halaman di mana pengguna mengisi product form) dan (product_detail untuk user melihat detail dari produk) dan juga mengubah main.html untuk inherit base.html
+
+6.  Menambahkan domain URL PWS di CSRF_TRUSTED_ORIGINS di settings.py agar dibolehkan oleh django untuk menerima data dari user di web tersebut.
+    ```python
+    CSRF_TRUSTED_ORIGINS = [
+        "[https://gibran-tegar-jualboladll.pbp.cs.ui.ac.id](https://gibran-tegar-jualboladll.pbp.cs.ui.ac.id)"
+    ]
+    ```
+7.  Menambahkan root/templates ke DIRS di TEMPLATES settings.py agar base.html menjadi berkas template
+
+## 6. Feedback untuk asdos
+Tidak ada, materi yang disajikan pada tutorial 2 sudah sangat komprehensif dan detail sehingga mahasiswa mudah menyerap materi nya. Terima kasih kak! 

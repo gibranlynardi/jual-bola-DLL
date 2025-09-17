@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'main:show_main' %}"><button>← Kembali ke Daftar Produk</button></a>
+
+<hr />
+
+<h1>{{ product.name }}</h1>
+
+{% if product.thumbnail %}
+<img src="{{ product.thumbnail }}" alt="Gambar untuk {{ product.name }}" width="400">
+<br /><br />
+{% endif %}
+
+<h3>Detail Produk:</h3>
+<ul>
+    <li><b>Harga:</b> Rp{{ product.price }}</li>
+    <li><b>Kategori:</b> {{ product.category }}</li>
+    {% if product.is_featured %}
+    <li><b>Status:</b> ⭐ Rekomendasi dari Cipeng!</li>
+    {% endif %}
+</ul>
+
+<h3>Deskripsi:</h3>
+<p>{{ product.description }}</p>
+
+{% endblock content %}
