@@ -12,42 +12,42 @@
         <li>kelas: <strong>{{ kelas_pbp }}</strong></li>
     </ul>
 
-        <a href="{% url 'main:create_product' %}">
+    <a href="{% url 'main:create_product' %}">
         <button>+ Add Product</button>
     </a>
 
     <hr />
 
-    {% if not product_list %}
-    <p>Belum ada data produk pada JUAL BOLA DLL.</p>
+    <h2>Daftar Produk</h2>
+
+    {% if not products %}
+        <p>Belum ada data produk pada JUAL BOLA DLL.</p>
     {% else %}
+        {% for product in products %}
+            <div>
+                <h3><a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h3>
 
-    {% for product in product_list %}
-    <div>
-        <h2><a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
+                {% if product.thumbnail %}
+                    <img src="{{ product.thumbnail }}" alt="thumbnail {{ product.name }}" width="250">
+                    <br />
+                {% endif %}
 
-        {% if product.thumbnail %}
-        <img src="{{ product.thumbnail }}" alt="thumbnail {{ product.name }}" width="250">
-        <br />
-        {% endif %}
+                <p>
+                    <b>Harga:</b> Rp{{ product.price }} |
+                    <b>Kategori:</b> {{ product.category }}
+                    {% if product.is_featured %}
+                        | <b>⭐ Rekomendasi Produk!</b>
+                    {% endif %}
+                </p>
 
-        <p>
-            <b>Harga:</b> Rp{{ product.price }} |
-            <b>Kategori:</b> {{ product.category }}
-            {% if product.is_featured %}
-            | <b>⭐ Rekomendasi Produk!</b>
-            {% endif %}
-        </p>
+                <p>{{ product.description|truncatewords:25 }}...</p>
 
-        <p>{{ product.description|truncatewords:25 }}...</p>
-
-        <a href="{% url 'main:show_product' product.id %}">
-            <button>Lihat Detail</button>
-        </a>
-    </div>
-
-    <hr />
-    {% endfor %}
-
+                <a href="{% url 'main:show_product' product.id %}">
+                    <button>Lihat Detail</button>
+                </a>
+            </div>
+            <hr />
+        {% endfor %}
     {% endif %}
+
 {% endblock content %}

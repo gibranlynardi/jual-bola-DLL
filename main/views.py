@@ -5,10 +5,12 @@ from main.models import Product
 from main.forms import ProductForm
 
 def show_main(request):
+    products = Product.objects.all()
     context = {
         'nama_toko' : 'Jual Bola DLL',
         'nama_pembuat' : 'Gibran Tegar Ramadhan Putra Lynardi',
-        'kelas_pbp' : 'PBP D'
+        'kelas_pbp' : 'PBP D',
+        'products': products
     }
 
     return render(request, "main.html", context)
