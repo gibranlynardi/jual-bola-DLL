@@ -24,4 +24,10 @@
 <h3>Deskripsi:</h3>
 <p>{{ product.description }}</p>
 
+{% if product.user %}
+    <p>Seller: {{ product.user.username }}</p>
+{% else %}
+    <p>Seller: Mungkin Prabo-</p>
+{% endif %}
+
 {% endblock content %}

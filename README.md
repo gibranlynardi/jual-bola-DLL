@@ -241,3 +241,51 @@ ada sebuah attack bernama Cross-Site Request Forgery (CSRF) di mana akan ada aks
 
 ## 6. Feedback untuk asdos
 Tidak ada, materi yang disajikan pada tutorial 2 sudah sangat komprehensif dan detail sehingga mahasiswa mudah menyerap materi nya. Terima kasih kak! 
+
+
+## TUGAS INDIVIDU 4
+
+### Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya.
+
+Jika kita pertimbangkan model pada `models.py` yang merupakan representasi dari struktur data yang akan disimpan pada database (misalnya `Product` yang menyimpan nama, dll), lalu jika kita memanggil `create_product` di mana kita bisa mengisi produk baru sesuai dengan ketentuan `ProductForm` di mana ada *fields* seperti `name`, `price`, dll. Maka `AuthenticationForm` juga sama, `AuthenticationForm` merupakan sebuah *class precoded* di Django TAPI *inherit* dari `forms.Form` untuk membuat form dengan data yang diterima yaitu *username* dan juga *password*, tapi `AuthenticationForm` hanya memvalidasi dan tidak terhubung pada suatu Model.
+
+**Kelebihan** dari `AuthenticationForm` adalah kontrol yang penuh juga kemudahan untuk menggunakan. Jika dibandingkan AaaS seperti Auth0, data yang kita miliki ada di di database kita sehingga kita punya *full data ownership and control*. *Simplicity* juga ada dibandingkan menggunakan servis autentikasi lain di mana kita harus ada *third-party SDK*, *API keys*, dll.
+
+Sementara **kekurangan** dari `AuthenticationForm` adalah kurangnya fitur autentikasi tambahan seperti menggunakan SSO, 2FA, dll.
+
+---
+
+### Apa perbedaan antara autentikasi dan otorisasi? Bagaimana Django mengimplementasikan kedua konsep tersebut?
+
+Dalam konsep holistik, **autentikasi** berarti pengecekan identitas user sementara **otorisasi** mengatur *permission* dan apa saja yang boleh dilakukan user.
+
+Django mengimplementasikan kedua konsep tersebut dengan menyediakan *class* `AuthenticationForm` atau lebih tepatnya dari `django.contrib.auth` yang ada fungsi `login`, `authenticate`. Sementara otorisasi diatur Django dengan *permissions* seperti `user.has_perm`, lalu *permission user* sesuai *role* pada model `User`, dan *decorator* seperti `@login_required`.
+
+---
+
+### Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+
+**Kelebihan** utamanya adalah memberikan *"holding state"* pada HTTP yang *stateless*. Selain itu, *session* dan *cookies* bekerja sama dengan cara *session* membuat file yang isinya adalah data-data termasuk data privat pengguna dan memberikan `SessionID` untuk nantinya `SessionID` inilah yang disimpan di *Cookies*, dengan cara ini, masalah *storage* teratasi karena *cookie* hanya 4KB max. Data privat juga disimpan di server bukan di klien sehingga dengan *tag team session* dan *cookies*, keamanan terjamin.
+
+**Kelemahan** *session* dan *cookies* adalah *dependency* dari *holding state mechanism* ini pada *cookies*, sementara *user* bisa saja menonaktifkan *cookies* pada browser. `SessionID` juga dapat diserang dan diambil.
+
+---
+
+### Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+
+Secara *default* tidaklah aman, secara filosofis, jika kita ada 100 cara untuk mengamankan sistem kita, ada 101 cara *hacker* menyerang kita. Contoh paling umum adalah CSRF, *sniffing*, bahkan XSS (mencuri *cookie*).
+
+Django berusaha mengamankan web dari potensi-potensi ini dengan menggunakan beberapa cara yaitu *flag* `HttpOnly` agar skrip-skrip tidak bisa membaca *cookie* karena hanya http yang bisa. Django juga memakai `csrf_token` untuk mengenali user.
+
+---
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+1.  Menambahkan *method-method views* baru untuk proses *registering* dan *authentication* yaitu `authenticate`, `login`, `logout` dari `django.contrib.auth` yang diimplementasikan pada `register`, `login_user`, dan `logout_user`. Saya juga mengimplementasikan *Forms* bawaan dari Django yaitu `UserCreationForm`, `AuthenticationForm`.
+2.  Menambahkan *path urls* baru yaitu `register/` dan `login/` dan dihubungkan pada *method* terkait.
+3.  Menambahkan *decorator* `@login_required` pada *method views* `show_main` dan `show_products` untuk memastikan otorisasi *user*.
+4.  Menggunakan *Cookie* untuk `set` *last\_login* waktunya kapan juga `delete_cookie` saat *logout*.
+5.  Menambahkan 2 berkas HTML baru yaitu `login.html`, `register.html`, juga modifikasi `main.html` dengan menambahkan tombol *Logout*, sesi terakhir *login*, dan *filter* untuk menyesuaikan hubungan antara *user* dan *product*.
+6.  Menghubungkan entitas *user* dan *product* di mana *product* memiliki *foreign key* dari *user* sehingga relasinya bisa *many-to-one* (*user* bisa punya banyak *product*).
+7.  Menambahkan *User* yang sedang *login* pada HTML agar terlihat oleh *user*.
+8.  Membuat dua akun di *local db*, `gibranlynardi` dan `sellerkosinduy` dan menambah masing-masing tiga produk.
