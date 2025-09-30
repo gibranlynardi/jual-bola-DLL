@@ -133,7 +133,7 @@ Menurut saya, Django digunakan karena menggunakan bahasa python yang memang terg
 
 Tidak ada, sudah sangat komprehensif sehingga jika belajar dari tutorial 1 sudah dapat mengaplikasikannya sendiri. Terima kasih banyakk kakak kakak asdoss! Mungkin jika memungkinkan beberapa tambahan troubleshooting disediakan juga jika memungkinkan.
 
-#### TUGAS INDIVIDU 2
+## TUGAS INDIVIDU 2
 
 ## 1.
 Data delivery diperlukan dikarenakan jika kita mengimplementasikan sebuah aplikasi pada suatu platform, maka akan ada user yang menggunakan aplikasi tersebut. User akan mengirimkan data-data pada client side dan diproses pada server side untuk dikembalikan kembali ke user. Jika tidak ada delivery maka kita tidak dapat melakukan transaksi data antara user dan server.
