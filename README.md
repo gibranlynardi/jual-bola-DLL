@@ -289,3 +289,48 @@ Django berusaha mengamankan web dari potensi-potensi ini dengan menggunakan bebe
 6.  Menghubungkan entitas *user* dan *product* di mana *product* memiliki *foreign key* dari *user* sehingga relasinya bisa *many-to-one* (*user* bisa punya banyak *product*).
 7.  Menambahkan *User* yang sedang *login* pada HTML agar terlihat oleh *user*.
 8.  Membuat dua akun di *local db*, `gibranlynardi` dan `sellerkosinduy` dan menambah masing-masing tiga produk.
+
+
+## TUGAS INDIVIDU 5
+**1. Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!**
+
+Dalam CSS selector, jika terdapat beberapa CSS selector yang diapply untuk suatu elemen, maka prioritas pengambilan CSS adalah ID selector dulu, lalu class selector, baru element selector. 
+
+Jika ingin lebih jauh lagi, kita bisa menambahkan `!important` untuk memastikan dialah yang paling utama ditambahkan. Tak hanya itu, jika kita membuat style dengan cara penulisan Internal Style Sheet, maka dia diutamakan terlebih dahulu.
+
+**2. Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!**
+
+Responsive web design sangatlah penting dalam pengembangan aplikasi web. Jika kita tidak mengimplementasikan responsive web design, web kita hanya bisa strictly diakses dengan nyaman pada SATU tipe device atau bahkan lebih parah SATU tipe device dari salah satu jenis perangkat (desktop, web, mobile). Dalam production, user kita datang dari berbagai macam device dan tipe/merk device, sehingga membuat responsive web design dalam production bukan menjadi pilihan lagi.
+
+**3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!**
+
+Dalam CSS, margin, border, dan padding merupakan properti fundamental dari box model yang berfungsi untuk mengatur ruang di sekitar sebuah elemen HTML. Padding adalah ruang transparan yang berada di antara konten elemen dan bordernya, sehingga memberikan ruang napas di bagian dalam. Selanjutnya, border adalah garis yang secara visual membungkus konten dan padding, yang bisa kita atur ketebalan, gaya, dan warnanya. Terakhir, margin adalah ruang transparan di luar border yang berfungsi untuk menciptakan jarak antara elemen tersebut dengan elemen lainnya di halaman. Untuk mengimplementasikannya, kita bisa mendefinisikan properti ini dalam CSS, contohnya dengan menuliskan `padding: 15px;`, `border: 2px solid black;`, dan `margin: 20px;` pada selector elemen yang dituju. Properti ini juga bisa diatur secara spesifik untuk tiap sisi, seperti `padding-top` atau `margin-left`.
+
+**4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!**
+
+Flexbox dan Grid adalah dua modul layout modern CSS yang sangat berguna untuk menata elemen secara efisien, menggantikan metode lama yang lebih rumit. Flexbox dirancang untuk tata letak satu dimensi, yang artinya sangat andal untuk mengatur elemen dalam satu baris atau satu kolom saja. Kegunaan utamanya adalah untuk komponen yang lebih kecil seperti menyusun menu navigasi atau meratakan item di dalam sebuah card secara dinamis. Sementara itu, Grid Layout diciptakan untuk tata letak dua dimensi, yaitu mengatur elemen dalam baris dan kolom secara bersamaan. Hal ini membuatnya sangat cocok untuk membangun struktur layout halaman web secara keseluruhan, misalnya membagi halaman menjadi bagian header, sidebar, konten utama, dan footer dengan presisi dan kontrol yang lebih besar.
+
+**Step by Step implementation**
+
+1.  Membuat fungsi-fungsi baru di `views.py` yaitu `edit_product` dan `delete_product` sehingga user dapat menghapus product yang dimiliki.
+2.  Mengarahkan fungsi-fungsi baru `views.py` tersebut di `urls.py`
+    ```python
+    path('register/', register, name='register'),
+    path('login/', login_user, name='login'),
+    path('logout/', logout_user, name='logout'),
+    ```
+3.  Menambah `'whitenoise.middleware.WhiteNoiseMiddleware'`, agar file static akan langsung `DEBUG=False`
+4.  Mengubah variable `static_url` dan `static_root`
+    ```python
+    STATIC_URL = '/static/'
+    if DEBUG:
+        STATICFILES_DIRS = [
+            BASE_DIR / 'static' # merujuk ke /static root project pada mode development
+        ]
+    else:
+        STATIC_ROOT = BASE_DIR / 'static'
+    ```
+5.  Menambah `global.css` dan menambahkan style glassmorphism
+6.  Menambah `navbar.html` agar ada header di web dan menyertakan style cssnya
+7.  Edit `base.html` dengan tailwindcss
+8.  Mengedit seluruh file di `main/templates` agar menyesuaikan dengan style css.
