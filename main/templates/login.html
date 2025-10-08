@@ -24,8 +24,7 @@
               {% endfor %}
           {% endfor %}
           {% for message in messages %}
-            <div class="px-4 py-3 rounded-md text-sm border bg-blue-500/20 border-blue-500/30 text-blue-200">{{ message }}</div>
-          {% endfor %}
+            {% endfor %}
       </div>
       {% endif %}
 
@@ -55,4 +54,15 @@
     </div>
   </div>
 </div>
+
+{% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for message in messages %}
+            showToast("{{ message.tags|capfirst }}", "{{ message }}", "{{ message.tags }}");
+        {% endfor %}
+    });
+</script>
+{% endif %}
+
 {% endblock content %}

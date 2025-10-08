@@ -1,4 +1,3 @@
-/* Keep your original form styles if you might switch back or use them elsewhere */
 .form-style form input, .form-style form textarea, .form-style form select {
     width: 100%;
     padding: 0.5rem;
@@ -47,8 +46,7 @@
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
 }
 
-/* --- NEW GLASSMORPHISM STYLES --- */
-/* Styles for form widgets rendered by Django in the new theme */
+
 form input[type="text"],
 form input[type="number"],
 form input[type="url"],
@@ -75,7 +73,7 @@ form select:focus {
     outline: none;
     background: rgba(255, 255, 255, 0.25);
     border-color: rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.5); /* teal-like glow */
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.5); 
 }
 
 /* Checkbox styling */
@@ -94,7 +92,7 @@ form input[type="checkbox"] {
 }
 
 form input[type="checkbox"]:checked {
-    background-color: #14b8a6; /* teal-500 */
+    background-color: #14b8a6; 
     border-color: #14b8a6;
 }
 
@@ -113,3 +111,29 @@ form input[type="checkbox"]:focus {
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.5);
 }
 
+.toast-base {
+    position: fixed; 
+    top: 5rem;
+    right: 2rem;
+    z-index: 9999; 
+    
+    width: auto; 
+    max-width: 350px; 
+    
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    
+    opacity: 0;
+    transform: translateX(120%);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.toast-success {
+    background-color: rgba(34, 197, 94, 0.9) !important;
+    border: 1px solid rgba(74, 222, 128, 0.3) !important;
+}
+.toast-error {
+    background-color: rgba(239, 68, 68, 0.9) !important;
+    border: 1px solid rgba(252, 165, 165, 0.3) !important;
+}

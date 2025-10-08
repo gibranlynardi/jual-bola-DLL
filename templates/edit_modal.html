@@ -1,0 +1,30 @@
+<div id="editModal" style="display: none; position: fixed; z-index: 50; top: 0; left: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(17, 24, 39, 0.6); backdrop-filter: blur(5px);">
+    <div class="max-w-lg w-full mx-auto my-12">
+        <div class="glassmorphism p-6 sm:p-8">
+            <div class="flex items-start justify-between mb-6">
+                <div><h3 class="text-2xl font-bold text-white">Edit Product</h3></div>
+                <button type="button" onclick="hideEditModal()" class="text-gray-400 bg-transparent hover:bg-gray-200/20 hover:text-white rounded-lg text-sm p-1.5 ml-auto">&times;</button>
+            </div>
+            <form id="editProductForm" class="space-y-5">
+                {% csrf_token %}
+                <input type="hidden" id="edit_product_id" name="id">
+                <div><label for="edit_name" class="block text-sm font-medium text-gray-200 mb-2">Name</label><input type="text" id="edit_name" name="name" required></div>
+                <div><label for="edit_price" class="block text-sm font-medium text-gray-200 mb-2">Price</label><input type="number" id="edit_price" name="price" required></div>
+                <div><label for="edit_description" class="block text-sm font-medium text-gray-200 mb-2">Description</label><textarea id="edit_description" name="description" rows="3"></textarea></div>
+                <div><label for="edit_thumbnail" class="block text-sm font-medium text-gray-200 mb-2">Thumbnail URL</label><input type="url" id="edit_thumbnail" name="thumbnail"></div>
+                <div><label for="edit_category" class="block text-sm font-medium text-gray-200 mb-2">Category</label><input type="text" id="edit_category" name="category"></div>
+                <div class="flex items-center"><input type="checkbox" id="edit_is_featured" name="is_featured"><label for="edit_is_featured" class="ml-2 text-sm font-medium text-gray-200">Featured</label></div>
+                <button type="submit" class="w-full bg-teal-500/80 text-white px-6 py-3 rounded-lg font-medium hover:bg-teal-500">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function hideEditModal() {
+        const editModal = document.getElementById('editModal');
+        if (editModal) {
+            editModal.style.display = 'none';
+        }
+    }
+</script>

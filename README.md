@@ -334,3 +334,20 @@ Flexbox dan Grid adalah dua modul layout modern CSS yang sangat berguna untuk me
 6.  Menambah `navbar.html` agar ada header di web dan menyertakan style cssnya
 7.  Edit `base.html` dengan tailwindcss
 8.  Mengedit seluruh file di `main/templates` agar menyesuaikan dengan style css.
+
+
+## TUGAS INDIVIDU 6
+**1. Perbedaan Antara Synchronous dan Asynchronous Request**
+Perbedaan mendasar antara synchronous dan asynchronous request terletak pada cara klien menangani komunikasi dengan server. Dalam model synchronous request, alur kerja nanti akan "blocking". Artinya, setelah klien mengirim permintaan, ia akan berhenti total dan menunggu hingga server memberikan respons sepenuhnya. Selama periode menunggu ini, UI sering kali menjadi tidak responsif atau "freeze", karena seluruh proses utama terhenti. Kalau asynchronous request menggunakan model "non-blocking". Ketika klien mengirim permintaan, ia tidak perlu menunggu respons dan dapat melanjutkan eksekusi tugas lainnya.
+
+**2. Alur Kerja AJAX di Django**
+Dalam aplikasi Django, alur kerja AJAX dimulai ketika sebuah event di sisi klien, seperti klik tombol, memicu fungsi JavaScript untuk mengirim fetch() ke URL tertentu di server. Django kemudian menggunakan urls.py untuk menyamakan URL tersebut dengan view yang sama. Di dalam views.py, view yang dituju akan menerima dan memproses permintaan tersebut. View ini hanya akan memproses data yang diperlukan—misalnya mengambil objek dari database dan mengemasnya dalam format data seperti JSON menggunakan JsonResponse. Respons JSON ini kemudian dikirim kembali ke klien. Terakhir, fungsi fetch() di JavaScript akan menerima respons tersebut dan menggunakannya untuk memperbarui bagian spesifik dari halaman (DOM) secara dinamis, sehingga konten berubah tanpa perlu memuat ulang seluruh halaman.
+
+**3.Keuntungan Menggunakan AJAX**
+Manfaat utamanya adalah better UX, karena halaman terasa lebih cepat dan responsif. Pengguna dapat berinteraksi dengan konten tanpa harus menunggu halaman refresh setiap saat. Selain itu, AJAX mengurangi beban server dan penggunaan bandwidth, karena server hanya perlu mengirimkan data dalam format ringkas seperti JSON, bukan seluruh file HTML yang lebih besar. Selain itu, pendekatan ini mendorong pemisahan logika yang lebih bersih antara backend yang berfungsi sebagai penyedia data (API) dan frontend yang bertanggung jawab penuh atas presentasi dan interaksi pengguna.
+
+**4.Keamanan AJAX untuk Fitur Login dan Register**
+AJAX biasanya paling rentan dengan XSS. Token CSRF harus disertakan dalam header permintaan AJAX agar divalidasi oleh Django di sisi server. Seluruh komunikasi juga harus diamankan dengan HTTPS untuk mengenkripsi data kredensial dan mencegah serangan man-in-the-middle. Di sisi backend, validasi sisi server yang ketat adalah suatu keharusan; jangan pernah mempercayai input yang datang dari klien tanpa memverifikasi format, kekuatan password, dan keunikan username atau email. Lakukan juga sanitasi input untuk mencegah serangan XSS lewat JS dan SQL Injection, meskipun Django ORM sudah memberikan perlindungan dasar. Terakhir, mengimplementasikan rate limiting untuk membatasi jumlah percobaan login yang gagal dari satu alamat IP guna menggagalkan serangan brute-force.
+
+**5.Pengaruh AJAX pada User Experience**
+AJAX secara fundamental mengubah dan meningkatkan UX pada sebuah situs web. Dampak paling terasa adalah peningkatan kecepatan, karena hanya bagian kecil dari halaman yang diperbarui, situs terasa lebih instan dan responsif. Hal ini menciptakan interaksi yang mulus, di mana pengguna dapat mengisi formulir, memfilter data, atau berinteraksi dengan elemen lain tanpa terganggu oleh proses loading halaman penuh yang menginterupsi alur kerja mereka. AJAX juga memungkinkan penyampaian umpan balik instan kepada pengguna, seperti menampilkan pesan validasi formulir secara real-time atau notifikasi sukses/gagal. 

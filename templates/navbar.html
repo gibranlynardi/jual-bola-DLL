@@ -24,16 +24,12 @@
                         <div class="text-sm font-medium text-white">{{ user.username }}</div>
                         <div class="text-xs text-gray-300">Welcome!</div>
                     </div>
-                    <a href="{% url 'main:logout' %}" class="bg-red-500/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-red-400/50">
+                    <a href="{% url 'main:logout' %}" id="logout-btn" class="bg-red-500/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-red-400/50">
                         Logout
                     </a>
                 {% else %}
-                    <a href="{% url 'main:login' %}" class="text-gray-200 hover:text-white font-medium transition-colors">
-                        Login
-                    </a>
-                    <a href="{% url 'main:register' %}" class="bg-teal-500/50 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-teal-400/50">
-                        Register
-                    </a>
+                    <button onclick="showLoginModal()" class="text-gray-200 hover:text-white font-medium transition-colors">Login</button>
+                    <button onclick="showRegisterModal()" class="bg-teal-500/50 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-teal-400/50">Register</button>
                 {% endif %}
             </div>
             
@@ -59,19 +55,37 @@
                         <div class="font-medium text-white">{{ user.username }}</div>
                         <div class="text-sm text-gray-300">Welcome!</div>
                     </div>
-                    <a href="{% url 'main:logout' %}" class="block bg-red-500/50 hover:bg-red-500 text-white font-medium py-3 px-4 rounded-lg text-center transition-colors border border-red-400/50">Logout</a>
+                    <a href="{% url 'main:logout' %}" id="mobile-logout-btn" class="block bg-red-500/50 hover:bg-red-500 text-white font-medium py-3 px-4 rounded-lg text-center transition-colors border border-red-400/50">Logout</a>
                 {% else %}
                     <div class="space-y-3">
-                        <a href="{% url 'main:login' %}" class="block text-gray-200 hover:text-white font-medium py-3 transition-colors">Login</a>
-                        <a href="{% url 'main:register' %}" class="block bg-teal-500/50 hover:bg-teal-500 text-white font-medium py-3 px-4 rounded-lg text-center transition-colors border border-teal-400/50">Register</a>
+                        <button onclick="showLoginModal()" class="block w-full text-left text-gray-200 hover:text-white font-medium py-3 transition-colors">Login</button>
+                        <button onclick="showRegisterModal()" class="block w-full text-center bg-teal-500/50 hover:bg-teal-500 text-white font-medium py-3 px-4 rounded-lg transition-colors border border-teal-400/50">Register</button>
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
     <script>
-        document.querySelector("button.mobile-menu-button")?.addEventListener("click", () => {
-            document.querySelector(".mobile-menu")?.classList.toggle("hidden");
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.querySelector("button.mobile-menu-button");
+            const mobileMenu = document.querySelector(".mobile-menu");
+            if (menuButton) {
+                menuButton.addEventListener("click", () => {
+                    if (mobileMenu) mobileMenu.classList.toggle("hidden");
+                });
+            }
+
+            const logoutHandler = function() {
+                if (typeof showToast === 'function') {
+                    showToast("Logged Out", "You have been successfully logged out.", "success");
+                }
+            };
+
+            const logoutBtn = document.getElementById('logout-btn');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
+            if (logoutBtn) logoutBtn.addEventListener('click', logoutHandler);
+            if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', logoutHandler);
         });
     </script>
 </nav>

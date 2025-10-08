@@ -9,59 +9,162 @@
 {% include 'navbar.html' %}
 <div class="w-full pt-24 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
     <div class="text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">{{ nama_toko }}</h1>
       <p class="text-gray-300 text-lg">Browse our collection of high-quality footballs and accessories.</p>
     </div>
-
-    {% if messages %}
-    <div class="max-w-3xl mx-auto mb-8 space-y-3">
-      {% for message in messages %}
-        <div class="px-4 py-3 rounded-md text-sm border {% if message.tags == 'success' %}bg-green-500/20 border-green-500/30 text-green-200{% else %}bg-blue-500/20 border-blue-500/30 text-blue-200{% endif %}">
-          {{ message }}
-        </div>
-      {% endfor %}
+    {% if user.is_authenticated %}
+    <div class="flex items-center justify-center mb-8 space-x-4">
+        <button onclick="showModal()" class="inline-flex items-center px-6 py-3 bg-teal-500/80 text-white rounded-md hover:bg-teal-500 transition-colors font-semibold">+ Add Product (AJAX)</button>
+        <button id="refresh-products" class="inline-flex items-center px-6 py-3 bg-white/10 text-gray-200 rounded-md hover:bg-white/20 transition-colors font-semibold border border-gray-200/20">Refresh Products</button>
     </div>
     {% endif %}
-
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 p-4 glassmorphism">
-      <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?filter=all" class="{% if filter_type == 'all' %} bg-teal-500/80 text-white{% else %}bg-white/10 text-gray-200 border border-transparent{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-teal-500 hover:text-white">
-          All Products
-        </a>
-        {% if user.is_authenticated %}
-        <a href="?filter=my" class="{% if filter_type == 'my' %} bg-teal-500/80 text-white{% else %}bg-white/10 text-gray-200 border border-transparent{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-teal-500 hover:text-white">
-          My Products
-        </a>
-        {% endif %}
-      </div>
-      {% if user.is_authenticated %}
-        <div class="text-sm text-gray-400">
-          Last login: {{ last_login }}
-        </div>
-      {% endif %}
-    </div>
-
-    {% if not products %}
-      <div class="glassmorphism p-12 text-center">
-        <div class="w-32 h-32 mx-auto mb-4">
-          <img src="{% static 'image/no-product.png' %}" alt="No products available" class="w-full h-full object-contain opacity-70">
-        </div>
+    <div id="loading" class="glassmorphism p-12 text-center" style="display: none;"><h3 class="text-xl font-medium text-white">Loading...</h3></div>
+    <div id="error" class="glassmorphism p-12 text-center" style="display: none;"><h3 class="text-xl font-medium text-red-400">An Error Occurred</h3></div>
+    <div id="empty" class="glassmorphism p-12 text-center" style="display: none;">
+        <img src="{% static 'image/no-product.png' %}" alt="No products" class="w-32 h-32 mx-auto mb-4 opacity-70">
         <h3 class="text-xl font-medium text-white mb-2">No Products Found</h3>
-        <p class="text-gray-300 mb-6">It looks a bit empty here. Why not add a new product?</p>
-        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-6 py-3 bg-teal-500/80 text-white rounded-md hover:bg-teal-500 transition-colors font-semibold">
-          Add a Product
-        </a>
-      </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {% for product in products %}
-          {% include 'card_product.html' with product=product %}
-        {% endfor %}
-      </div>
-    {% endif %}
+    </div>
+    <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
   </div>
 </div>
-{% endblock content %}
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const CURRENT_USER_ID = "{{ user.id }}";
+
+    function buildProductCardElement(product) {
+        const fields = product.fields;
+        const owner = fields.user_id && CURRENT_USER_ID && fields.user_id.toString() === CURRENT_USER_ID.toString();
+        let ownerActions = '';
+        if (owner) {
+            ownerActions = `
+            <div class="flex items-center justify-end space-x-2 pt-3 border-t border-gray-100/20 z-10 relative mt-auto">
+                <a href="/products/${product.pk}/edit/" class="edit-btn text-gray-300 hover:text-white text-sm transition-colors px-3 py-1 rounded-md bg-white/10 hover:bg-white/20">Edit</a>
+                <button data-id="${product.pk}" class="delete-btn text-red-400 hover:text-red-300 text-sm transition-colors px-3 py-1 rounded-md bg-red-500/10 hover:bg-red-500/20">Delete</button>
+            </div>`;
+        }
+        const thumbnail = DOMPurify.sanitize(fields.thumbnail || '');
+        const category = DOMPurify.sanitize(fields.category || '');
+        const name = DOMPurify.sanitize(fields.name || 'No Name');
+        const description = DOMPurify.sanitize(fields.description || '');
+
+        return `
+        <article class="glassmorphism group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col">
+            <div class="aspect-video relative">
+                ${thumbnail ? `<img src="${thumbnail}" alt="${name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">` : `<div class="w-full h-full bg-gray-900/50 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>`}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                ${category ? `<div class="absolute top-4 left-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-teal-500/80 text-white">${category}</span></div>` : ''}
+                <div class="absolute bottom-4 right-4"><span class="text-xl font-bold text-white bg-black/50 px-3 py-1 rounded-lg">Rp ${fields.price}</span></div>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+                <h3 class="text-lg font-semibold text-white mb-2 line-clamp-2 leading-tight flex-grow"><a href="/product/${product.pk}/" class="hover:text-teal-300 transition-colors stretched-link">${name}</a></h3>
+                <p class="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">${description.substring(0,100)}</p>
+                ${ownerActions}
+            </div>
+        </article>`;
+    }
+
+    async function fetchProductsFromServer() {
+        const states = { loading: document.getElementById('loading'), error: document.getElementById('error'), empty: document.getElementById('empty'), grid: document.getElementById('product-grid') };
+        states.loading.style.display = 'block';
+        states.error.style.display = 'none';
+        states.empty.style.display = 'none';
+        states.grid.style.display = 'none';
+        try {
+            const response = await fetch("{% url 'main:show_json' %}");
+            if (!response.ok) throw new Error('Network error');
+            const products = await response.json();
+            if (products.length === 0) {
+                states.empty.style.display = 'block';
+            } else {
+                states.grid.innerHTML = products.map(buildProductCardElement).join('');
+                states.grid.style.display = 'grid';
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            states.error.style.display = 'block';
+        } finally {
+            states.loading.style.display = 'none';
+        }
+    }
+
+    function handleDeleteClick(productId) {
+        showConfirmDeleteModal(async () => {
+            try {
+                const response = await fetch(`/delete-product-ajax/${productId}/`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast('Success', data.message, 'success');
+                    fetchProductsFromServer();
+                } else { throw new Error(data.message); }
+            } catch (error) {
+                showToast('Error', error.message || 'Could not delete.', 'error');
+            }
+        });
+    }
+
+    async function showEditModal(productId) {
+        try {
+            const response = await fetch(`/edit-product-ajax/${productId}/`);
+            if (!response.ok) throw new Error('Failed to fetch product data.');
+            const data = await response.json();
+            
+            document.getElementById('edit_product_id').value = productId;
+            document.getElementById('edit_name').value = data.name;
+            document.getElementById('edit_price').value = data.price;
+            document.getElementById('edit_description').value = data.description;
+            document.getElementById('edit_thumbnail').value = data.thumbnail || '';
+            document.getElementById('edit_category').value = data.category || '';
+            document.getElementById('edit_is_featured').checked = data.is_featured;
+            
+            document.getElementById('editModal').style.display = 'block';
+        } catch (error) {
+            console.error(error);
+            showToast('Error', 'Could not fetch product details.', 'error');
+        }
+    }
+
+    const editForm = document.getElementById('editProductForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const productId = document.getElementById('edit_product_id').value;
+            const response = await fetch(`/edit-product-ajax/${productId}/`, {
+                method: "POST", body: new FormData(this)
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                hideEditModal();
+                showToast("Success", data.message, "success");
+                fetchProductsFromServer();
+            } else { 
+                alert("Update failed. Please check your input."); 
+            }
+        });
+    }
+
+    document.getElementById('product-grid').addEventListener('click', (event) => {
+        const deleteBtn = event.target.closest('.delete-btn');
+        const editBtn = event.target.closest('.edit-btn');
+        
+        if (deleteBtn) {
+            handleDeleteClick(deleteBtn.dataset.id);
+        }
+        if (editBtn) {
+            event.preventDefault();
+            const urlParts = editBtn.href.split('/');
+            const productId = urlParts[urlParts.length - 3]; 
+            showEditModal(productId);
+        }
+    });
+
+    fetchProductsFromServer();
+    const refreshButton = document.getElementById('refresh-products');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', fetchProductsFromServer);
+    }
+    document.addEventListener('productAdded', fetchProductsFromServer);
+});
+</script>
+{% endblock content %}

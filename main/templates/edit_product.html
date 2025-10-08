@@ -46,4 +46,15 @@
         </div>
     </div>
 </div>
+
+{% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for message in messages %}
+            showToast("{{ message.tags|capfirst }}", "{{ message }}", "{{ message.tags }}");
+        {% endfor %}
+    });
+</script>
+{% endif %}
+
 {% endblock %}
