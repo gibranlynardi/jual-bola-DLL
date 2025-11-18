@@ -17,6 +17,11 @@
     <div class="flex items-center justify-center mb-8 space-x-4">
         <button onclick="showModal()" class="inline-flex items-center px-6 py-3 bg-teal-500/80 text-white rounded-md hover:bg-teal-500 transition-colors font-semibold">+ Add Product (AJAX)</button>
         <button id="refresh-products" class="inline-flex items-center px-6 py-3 bg-white/10 text-gray-200 rounded-md hover:bg-white/20 transition-colors font-semibold border border-gray-200/20">Refresh Products</button>
+        <select id="sorting" class="inline-flex items-center px-6 py-3 bg-white/10 text-gray-200 rounded-md hover:bg-white/20 transition-colors font-semibold border border-gray-200/20">
+            <option value="default" class="text-black">default</option>
+            <option value="ascending" class ="text-black">ascending</option>
+            <option value="ascending" class = "text-black">descending</option>
+        </select>
     </div>
     {% endif %}
     <div id="loading" class="glassmorphism p-12 text-center" style="display: none;"><h3 class="text-xl font-medium text-white">Loading...</h3></div>
@@ -32,7 +37,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const CURRENT_USER_ID = "{{ user.id }}";
-
+    const sortSelect = document.getElementById("sorting");
     function buildProductCardElement(product) {
         const fields = product.fields;
         const owner = fields.user_id && CURRENT_USER_ID && fields.user_id.toString() === CURRENT_USER_ID.toString();
@@ -71,8 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
         states.error.style.display = 'none';
         states.empty.style.display = 'none';
         states.grid.style.display = 'none';
+        const sortValue = sortSelect.value;
+
         try {
-            const response = await fetch("{% url 'main:show_json' %}");
+            const response = await fetch("{% url 'main:show_json' %}?sort=${sortValue}");
             if (!response.ok) throw new Error('Network error');
             const products = await response.json();
             if (products.length === 0) {
@@ -163,6 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshButton = document.getElementById('refresh-products');
     if (refreshButton) {
         refreshButton.addEventListener('click', fetchProductsFromServer);
+    }
+    if (sortSelect){
+        sortSelect.addEventListener('change', )
     }
     document.addEventListener('productAdded', fetchProductsFromServer);
 });

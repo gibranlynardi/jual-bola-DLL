@@ -12,6 +12,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -59,22 +62,56 @@ def show_product(request, id):
     context = {'product_id': id}
     return render(request, "product_detail.html", context)
 
+# Tambahkan View JSON untuk Flutter (CREATE)
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        new_product = Product.objects.create(
+            user=request.user,
+            name=data["name"],
+            price=int(data["price"]),
+            description=data["description"],
+            category=data["category"],
+            thumbnail=data["thumbnail"],
+            is_featured=data["is_featured"]
+        )
+        new_product.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+    
 def show_xml(request):
     product_list = Product.objects.all()
     return HttpResponse(serializers.serialize("xml", product_list), content_type="application/xml")
 
+@csrf_exempt
 def show_json(request):
-    product_list = Product.objects.select_related('user').all()
-    data = [{
-        'pk': str(product.pk),
-        'fields': {
-            'name': product.name, 'price': product.price, 'description': product.description,
-            'thumbnail': product.thumbnail, 'category': product.category, 'is_featured': product.is_featured,
-            'user_id': product.user.id if product.user else None,
-        }
-    } for product in product_list]
-    return JsonResponse(data, safe=False)
+    if request.user.is_authenticated:
+        product_list = Product.objects.filter(user=request.user)
+    else:
+        product_list = []
+    
+    return HttpResponse(serializers.serialize("json", product_list), content_type="application/json")
 
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        new_product = Product.objects.create(
+            user=request.user,
+            name=data["name"],
+            price=int(data["price"]),
+            description=data["description"],
+            category=data["category"],
+            thumbnail=data["thumbnail"],
+            is_featured=data["is_featured"]
+        )
+        new_product.save()
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+    
 def show_xml_by_id(request, product_id):
     product_item = Product.objects.filter(pk=product_id)
     return HttpResponse(serializers.serialize("xml", product_item), content_type="application/xml")
